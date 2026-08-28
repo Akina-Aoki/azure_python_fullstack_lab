@@ -1,0 +1,55 @@
+# Define the containers that make up the application
+services:
+
+  # FastAPI backend service
+  backend:
+    # Give the running container a clear name
+    container_name: backend
+
+    # Build the container for the AMD64 Linux platform
+    platform: linux/amd64
+
+    # Instructions for building the backend image
+    build:
+      # Use the current project folder as the build context to be extra clear
+      context: .
+
+      # Use this Dockerfile to build the backend
+      dockerfile: dockerfiles/backend.dockerfile
+
+    # Map port 8000 on the computer to port 8000 in the container
+    ports:
+      - "8000:8000"
+
+    # Name and version of the backend image in Azure Container Registry
+    # This needs to be changed
+    image: deployaira-btangacjhacadfee.azurecr.io/backend:v1
+
+  # Streamlit frontend service
+  frontend:
+    # Give the running container a clear name
+    container_name: frontend
+
+    # Build the container for the AMD64 Linux platform
+    platform: linux/amd64
+
+    # Instructions for building the frontend image
+    build:
+      # Use the current project folder as the build context
+      context: .
+
+      # Use this Dockerfile to build the frontend
+      dockerfile: dockerfiles/frontend.dockerfile
+
+    # Map port 8501 on the computer to port 8501 in the container
+    ports:
+      - "8501:8501"
+
+    # Environment variables available inside the frontend container
+    environment:
+      # "backend" is the service name Docker uses on its internal network
+      BACKEND_URL: http://backend:8000
+
+    # Name and version of the frontend image in Azure Container Registry
+    # This needs to be changed
+    image: deployaira-btangacjhacadfee.azurecr.io/frontend:v2
