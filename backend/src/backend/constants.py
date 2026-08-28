@@ -1,12 +1,8 @@
 """
-Define the FastAPI application and its Pokémon API endpoints.
-
-The API allows clients to:
-1. Retrieve every Pokémon.
-2. Retrieve the number of Pokémon belonging to each type.
-3. Filter Pokémon by a requested type.
+Filesystem paths used by the eclipse backend."
 """
 
+from pathlib import Path
 from fastapi import FastAPI
 
 # Import the processed data and filtering function.

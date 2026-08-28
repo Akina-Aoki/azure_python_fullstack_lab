@@ -1,110 +1,97 @@
 """
-Define the FastAPI application and its Pokémon API endpoints.
+FastAPI endpoints for the eClipsedBord Dashboard.
 
 The API allows clients to:
-1. Retrieve every Pokémon.
-2. Retrieve the number of Pokémon belonging to each type.
-3. Filter Pokémon by a requested type.
+1. Retrieve lunar and solar eclipse year and eclipse category.
+2. Filter year and eclipse category based on requested filters .
 """
 
 from fastapi import FastAPI
+from typing import any
+import pandas as pd
 
-# Import the processed data and filtering function.
-from backend.data_processing import df, filtered_types, number_per_type
+# Import the processed data and filtering functions.
+from backend.data_processing import (
+    filter_lunar_by_category,
+    filter_lunar_by_year,
+    filter_solar_by_category,
+    filter_solar_by_year,
+    lunar_eclipses,
+    solar_eclipses,
+
+)
 
 
 # Create the FastAPI application.
 # The "app" object receives requests and connects them to functions.
-app = FastAPI()
+app = FastAPI(
+    title = "eClipseBord by FastlyDep",
+    description="Explore transformed Solar and Lunar eclipse data by year and category.",
+)
+
+def json_records(data: pd.DataFrame) -> list[dict[str, Any]]:
+    """Convert a DataFrame, including missing values, into JSON-safe records."""
+    clean_data = data.astype(object).where(pd.notna(data), None)
+    return clean_data.to_dict(orient="records")
 
 
 # ============================================================
-# ENDPOINT 1: RETURN ALL POKÉMON
+# ENDPOINT 1: Return all solar eclipses 
 # ============================================================
 
 # @app.get() creates an HTTP GET endpoint.
 #
 # This endpoint can be accessed at:
-# GET /pokemons/stats
-@app.get("/pokemons/stats")
-async def show_data():
-    """
-    Return all Pokémon records.
+# GET /solar-eclipses
+@app.get("/solar-eclipses",
+        summary = "Get solar eclipses",
+        description = "Optionally filter solar eclipses by year and category",
+         )
 
-    Returns
-    -------
-    list[dict]
-        A list in which each dictionary represents one Pokémon row.
-        FastAPI converts the result into JSON automatically.
+async def get_solar_eclipses(
+    year: int | None = None,
+    eclipse_category: str | None = None,
+):
     """
-
-    # orient="records" produces a list of dictionaries.
-    #
-    # Example:
-    # [
-    #     {"Name": "Bulbasaur", "Type 1": "Grass"},
-    #     {"Name": "Charmander", "Type 1": "Fire"}
-    # ]
-    return df.to_dict(orient="records")
+    Return Solar eclipse records for the selected filters.
+    """
+    data = solar_eclipses
+    if year is not None:
+        data = filter_solar_by_year(year)
+    if eclipse_category is not None:
+        data = (
+             filter_solar_by_category(eclipse_category)
+            if year is None
+            else data[data["Eclipse Category"] == eclipse_category]
+        )
+    return json_records(data)           
+        
 
 
 # ============================================================
-# ENDPOINT 2: RETURN THE COUNT FOR EACH TYPE
+# ENDPOINT 2: Return all lunar eclipses 
 # ============================================================
 
 # This endpoint can be accessed at:
-# GET /pokemons/number_types
-@app.get("/pokemons/number_types")
-async def number_pokemons_per_type():
-    """
-    Return the total number of Pokémon associated with each type.
+# GET /lunar_eclipses
+@app.get(
+    "/lunar-eclipses",
+    summary="Get Lunar eclipses",
+    description="Optionally filter Lunar eclipses by year and category.",
+)
+async def get_lunar_eclipses(
+    year: int | None = None,
+    eclipse_category: str | None = None,
+):
+    """Return Lunar eclipse records for the selected filters."""
+    data = lunar_eclipses
+    if year is not None:
+        data = filter_lunar_by_year(year)
+    if eclipse_category is not None:
+        data = (
+            filter_lunar_by_category(eclipse_category)
+            if year is None
+            else data[data["Eclipse Category"] == eclipse_category]
+        )
+    return json_records(data)
 
-    The count includes Pokémon where the type appears as either
-    "Type 1" or "Type 2".
-
-    Returns
-    -------
-    dict
-        A dictionary mapping each Pokémon type to its total count.
-    """
-
-    # Convert the Pandas Series into a regular Python dictionary.
-    #
-    # Example:
-    # {
-    #     "Water": 126,
-    #     "Normal": 102,
-    #     "Flying": 101
-    # }
-    return number_per_type.to_dict()
-
-
-# ============================================================
-# ENDPOINT 3: FILTER BY TYPE
-# ============================================================
-
-# Because poke_type is not included directly in the route,
-# FastAPI treats it as a required query parameter.
-#
-# Example request:
-# GET /pokemons/type?poke_type=Fire
-@app.get("/pokemons/type")
-async def filter_pokemon_type(poke_type):
-    """
-    Return Pokémon matching a requested type.
-
-    Parameters
-    ----------
-    poke_type:
-        A required query parameter containing a Pokémon type,
-        such as "Fire", "Water" or "Grass".
-
-    Returns
-    -------
-    list[dict]
-        Matching Pokémon records converted into JSON-compatible data.
-    """
-
-    # filtered_types() returns a filtered DataFrame.
-    # orient="records" converts each row into a dictionary.
-    return filtered_types(poke_type).to_dict(orient="records")
