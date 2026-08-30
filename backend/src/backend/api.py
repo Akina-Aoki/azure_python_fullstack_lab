@@ -1,9 +1,12 @@
 """
-FastAPI endpoints for the eClipsedBord Dashboard.
+Create the FastAPI endpoints for the eClipseBord dashboard.
 
 The API allows clients to:
-1. Retrieve lunar and solar eclipse year and eclipse category.
-2. Filter year and eclipse category based on requested filters .
+
+1. Retrieve Solar eclipse records.
+2. Retrieve Lunar eclipse records.
+3. Optionally filter the records by year.
+4. Optionally filter the records by eclipse category.
 """
 
 from fastapi import FastAPI
@@ -30,9 +33,29 @@ app = FastAPI(
 )
 
 def json_records(data: pd.DataFrame) -> list[dict[str, Any]]:
-    """Convert a DataFrame, including missing values, into JSON-safe records."""
-    clean_data = data.astype(object).where(pd.notna(data), None)
-    return clean_data.to_dict(orient="records")
+
+    """
+    Convert a Pandas DataFrame into JSON-compatible records.
+
+    Pandas may contain missing values such as NaN. JSON cannot represent
+    NaN reliably, so the missing values are replaced with None. FastAPI
+    converts Python's None value into JSON null.
+
+    Parameters
+    ----------
+    data:
+        The DataFrame that should be returned by the API.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        A list of dictionaries where each dictionary represents one row.
+    """
+
+                                                                                
+    clean_data = data.astype(object)                                               # Convert the DataFrame to object type so it can contain None values.
+    clean_data = data.astype(object).where(pd.notna(data), None)                   # Convert the DataFrame to object type so it can contain None values.
+    return clean_data.to_dict(orient="records")                                    # Convert every DataFrame row into a dictionary.
 
 
 # ============================================================
@@ -52,19 +75,43 @@ async def get_solar_eclipses(
     year: int | None = None,
     eclipse_category: str | None = None,
 ):
+    
     """
-    Return Solar eclipse records for the selected filters.
+      Return Solar eclipse records using the selected filters.
+
+    Parameters
+    ----------
+    year:
+        Optional year selected by the user. If it is not provided,
+        records from every year are available.
+
+    eclipse_category:
+        Optional eclipse category, such as Partial, Annular, Total,
+        or Hybrid.
+
+    Returns
+    -------
+    list[dict]
+        Solar eclipse records converted into JSON-compatible data.  
     """
+
+    # Begin with the complete Solar eclipse dataset.
     data = solar_eclipses
-    if year is not None:
+    if year is not None:                                    # Apply the year filter only when the user provides a year.
         data = filter_solar_by_year(year)
-    if eclipse_category is not None:
+    if eclipse_category is not None:                         # Apply the category filter only when the user provides a category.
         data = (
              filter_solar_by_category(eclipse_category)
+
+            # If no year was selected, filter the complete Solar dataset
+            # using the category-filtering function.
             if year is None
+
+            # If a year was already selected, filter the year results
+            # so that both filters are applied.
             else data[data["Eclipse Category"] == eclipse_category]
         )
-    return json_records(data)           
+    return json_records(data)                               # Convert the filtered DataFrame into JSON-compatible records.     
         
 
 
@@ -83,7 +130,24 @@ async def get_lunar_eclipses(
     year: int | None = None,
     eclipse_category: str | None = None,
 ):
-    """Return Lunar eclipse records for the selected filters."""
+    """
+    Return Lunar eclipse records using the selected filters.
+
+    Parameters
+    ----------
+    year:
+        Optional year selected by the user. If it is not provided,
+        records from every year are available.
+
+    eclipse_category:
+        Optional Lunar eclipse category, such as Penumbral,
+        Partial, or Total.
+
+    Returns
+    -------
+    list[dict]
+        Lunar eclipse records converted into JSON-compatible data.
+    """
     data = lunar_eclipses
     if year is not None:
         data = filter_lunar_by_year(year)

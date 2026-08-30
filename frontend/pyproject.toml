@@ -1,7 +1,7 @@
 [project]
 name = "frontend"
 version = "0.1.0"
-description = "Add your description here"
+description = "Streamlit frontend for eClipseBord - Azure Python Fullstack Lab"
 readme = "README.md"
 authors = [
     { name = "Aira Franco", email = "adelosofranco@gmail.com" }

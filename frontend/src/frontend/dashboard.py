@@ -1,11 +1,5 @@
 """
-Create the Streamlit frontend for the Pokémon dashboard.
-
-This application:
-1. Connects to the FastAPI backend.
-2. Retrieves Pokémon data through API requests.
-3. Displays a chart and data tables.
-4. Allows the user to filter Pokémon by type.
+Streamlit frontend for the eClipseBord dashboard.
 """
 
 import os
@@ -32,156 +26,108 @@ import streamlit as st
 BASE_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
 
+# AI-assisted refactor:
+def get_eclipse_data(route: str, params: dict | None = None) -> pd.DataFrame:
+    """Request eclipse records from FastAPI and return them as a DataFrame."""
+
+    # Build the API URL and send an HTTP GET request.
+    response = httpx.get(f"{BASE_URL}/{route}", params=params, timeout=30.0)
+
+    # Raise an error if FastAPI returns an unsuccessful status code.
+    response.raise_for_status()
+
+    # Convert the JSON response into a Pandas DataFrame.
+    return pd.DataFrame(response.json())
+
+
+
+# ============================================================
+# DISPLAY ONE ECLIPSE TAB
+# ============================================================
+
+
+def show_eclipse_tab(label: str, route: str) -> None:
+    """Display one eclipse dataset with the approved filters."""
+    all_eclipses = get_eclipse_data(route)
+
+
+    # AI-assisted refactor: category options come directly from transformed data.
+    # Get every unique year and sort them from earliest to latest.
+    years = sorted(all_eclipses["Year"].unique())
+
+    # Get every available eclipse category without duplicates.
+    categories = all_eclipses["Eclipse Category"].drop_duplicates().tolist()
+
+    # Create a dropdown menu for selecting a year.
+    selected_year = st.selectbox(
+        f"{label} eclipse year",
+        options=years,
+        index=years.index(2000) if 2000 in years else 0,             # select 2000 as default
+        key=f"{route}-year",                                        # Give the widget a unique key for the Solar or Lunar tab.
+    )
+
+
+    # Create a dropdown menu for selecting an eclipse category.
+    selected_category = st.selectbox(
+        f"{label} eclipse category",
+        options=categories,
+        key=f"{route}-category",
+    )
+
+
+    # Request only the records matching both selected filters.
+    filtered_eclipses = get_eclipse_data(
+        route,
+        params={
+            "year": int(selected_year),
+            "eclipse_category": selected_category,
+        },
+    )
+
+
+    # Display the number of matching eclipse records.
+    st.write(
+        f"{len(filtered_eclipses)} {label.lower()} eclipse record(s) match "
+        "the selected filters."
+    )
+
+    # Display the matching records as an interactive table.
+    st.dataframe(filtered_eclipses, use_container_width=True)
+
+
+
 # ============================================================
 # MAIN STREAMLIT APPLICATION
 # ============================================================
 
-def main():
+# AI-assisted refactor:
+def main() -> None:
     """
-    Build and display the PokeDash Streamlit dashboard.
+    Build the eClipseBord dashboard.
 
-    The function retrieves data from the FastAPI backend and displays:
-
-    - The backend URL
-    - A bar chart showing the most common Pokémon types
-    - A table containing all Pokémon
-    - A type-selection dropdown
-    - A table containing Pokémon matching the selected type
+    The dashboard contains separate tabs for Solar and Lunar
+    eclipse data. Each tab has its own year and category filters.
     """
 
-    # Create the main dashboard title.
-    # A single # in Markdown creates a level-one heading.
-    st.markdown("# PokeDash")
+    # Configure the browser tab title and use the full page width.
+    st.set_page_config(page_title="eClipseBord", layout="wide")
 
-    # Display the backend URL currently being used.
-    # This can be helpful when checking whether the application
-    # is connecting to a local or deployed backend.
-    st.write(BASE_URL)
+    # Display the dashboard title and introduction.
+    st.title("eClipseBord")
+    st.markdown("Explore Solar and Lunar eclipses by year and eclipse category.")
 
 
-    # ========================================================
-    # GET ALL POKÉMON
-    # ========================================================
+    # Create separate tabs for the two eclipse datasets.
+    solar_tab, lunar_tab = st.tabs(["Solar eclipses", "Lunar eclipses"])
 
-    # Send an HTTP GET request to the FastAPI /pokemons/stats endpoint.
-    #
-    # httpx.get() returns an HTTP Response object.
-    # .json() converts the JSON response into Python data.
-    #
-    # In this case, the result should be a list of dictionaries.
-    stats = httpx.get(f"{BASE_URL}/pokemons/stats").json()
+    # Display the Solar eclipse filters and table.
+    with solar_tab:
+        show_eclipse_tab("Solar", "solar-eclipses")
 
-    # Display introductory text underneath the dashboard title.
-    st.markdown("All cool stuffs u need 2 know abt pokes")
+    # Display the Lunar eclipse filters and table.
+    with lunar_tab:
+        show_eclipse_tab("Lunar", "lunar-eclipses")
 
 
-    # ========================================================
-    # DISPLAY THE POKÉMON TYPE CHART
-    # ========================================================
-
-    # Create a level-two heading.
-    st.markdown("## PokeTypes")
-
-    # Request the calculated Pokémon type counts from FastAPI.
-    #
-    # The expected response looks similar to:
-    # {
-    #     "Water": 126,
-    #     "Normal": 102,
-    #     "Flying": 101
-    # }
-    pokemons_per_type = httpx.get(
-        f"{BASE_URL}/pokemons/number_types"
-    ).json()
-
-    # Convert the dictionary into a Pandas DataFrame.
-    #
-    # .items() produces key-value pairs:
-    # ("Water", 126), ("Normal", 102), ...
-    #
-    # list() converts those pairs into a list.
-    #
-    # The resulting DataFrame has two columns:
-    # - type
-    # - number
-    pokemons_per_type = pd.DataFrame(
-        list(pokemons_per_type.items()),
-        columns=["type", "number"],
-    )
-
-    # Display a bar chart containing the first eight Pokémon types.
-    #
-    # head(8) selects the first eight rows.
-    # x="type" places the Pokémon types on the horizontal axis.
-    # y="number" controls the height of each bar.
-    st.bar_chart(
-        pokemons_per_type.head(8),
-        x="type",
-        y="number",
-    )
-
-
-    # ========================================================
-    # DISPLAY ALL POKÉMON
-    # ========================================================
-
-    # Display the complete list of Pokémon as an interactive table.
-    st.dataframe(stats)
-
-
-    # ========================================================
-    # CREATE THE TYPE FILTER
-    # ========================================================
-
-    # Convert the list of Pokémon dictionaries into a DataFrame.
-    # This makes it possible to work with columns such as "Type 1".
-    df = pd.DataFrame(stats)
-
-    # Select all unique primary Pokémon types.
-    #
-    # unique() removes repeated values.
-    #
-    # Example:
-    # ["Grass", "Fire", "Water", "Bug", ...]
-    types = df["Type 1"].unique()
-
-    # Display a dropdown menu containing the available types.
-    #
-    # Streamlit stores the user's selected value in poke_type.
-    poke_type = st.selectbox(
-        label="Choose pokemon type",
-        options=types,
-    )
-
-
-    # ========================================================
-    # REQUEST THE FILTERED POKÉMON
-    # ========================================================
-
-    # Send the selected type to the FastAPI endpoint as a query parameter.
-    #
-    # Example request:
-    # /pokemons/type?poke_type=Fire
-    #
-    # The API returns Pokémon whose Type 1 or Type 2 is "Fire".
-    poke_types = httpx.get(
-        f"{BASE_URL}/pokemons/type?poke_type={poke_type}"
-    ).json()
-
-    # Display the filtered Pokémon as another interactive table.
-    st.dataframe(poke_types)
-
-    # Display text underneath the filtered table.
-    st.markdown("Pokemon stats")
-
-
-# ============================================================
-# APPLICATION ENTRY POINT
-# ============================================================
-
-# Python sets __name__ to "__main__" when this file is executed directly.
-#
-# This condition prevents main() from running automatically if the file
-# is imported into another Python module.
-if __name__ == "__main__":
-    main()
+# Start the Streamlit application.
+main()
