@@ -23,7 +23,7 @@ services:
 
     # Name and version of the backend image in Azure Container Registry
     # This needs to be changed
-    image: deployaira-btangacjhacadfee.azurecr.io/backend:v1
+    image: eclipsebord-backend:v1
 
   # Streamlit frontend service
   frontend:
@@ -38,7 +38,7 @@ services:
       # Use the current project folder as the build context
       context: .
 
-      # Use this Dockerfile to build the frontend
+      # Use this Dockerfile to build the frontendcle
       dockerfile: dockerfiles/frontend.dockerfile
 
     # Map port 8501 on the computer to port 8501 in the container
@@ -52,4 +52,4 @@ services:
 
     # Name and version of the frontend image in Azure Container Registry
     # This needs to be changed
-    image: deployaira-btangacjhacadfee.azurecr.io/frontend:v2
+    image: eclipsebord-frontend:v1

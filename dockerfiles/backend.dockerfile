@@ -20,4 +20,5 @@ WORKDIR /app/src/backend
 # Start the FastAPI application using Uvicorn
 # api:app means: use the variable named "app" inside api.py
 # 0.0.0.0 makes the API accessible outside the Docker container
+# the packaged blueprint containing the code and dependencies
 CMD ["uv", "run", "uvicorn", "api:app", "--host", "0.0.0.0"]
