@@ -10,7 +10,7 @@ The API allows clients to:
 """
 
 from fastapi import FastAPI
-from typing import any
+from typing import Any
 import pandas as pd
 
 # Import the processed data and filtering functions.
@@ -35,11 +35,12 @@ app = FastAPI(
 def json_records(data: pd.DataFrame) -> list[dict[str, Any]]:
 
     """
-    Convert a Pandas DataFrame into JSON-compatible records.
-
-    Pandas may contain missing values such as NaN. JSON cannot represent
-    NaN reliably, so the missing values are replaced with None. FastAPI
-    converts Python's None value into JSON null.
+    dataframe: pd.DataFrame — the input should be a pandas DataFrame.
+    -> — shows what the function returns.
+    list[...] — it returns a list.
+    dict[str, Any] — each item is a dictionary:
+        The keys are strings, such as "Year".
+        The values can be any type: text, numbers, booleans, or None.
 
     Parameters
     ----------
@@ -48,8 +49,13 @@ def json_records(data: pd.DataFrame) -> list[dict[str, Any]]:
 
     Returns
     -------
-    list[dict[str, Any]]
-        A list of dictionaries where each dictionary represents one row.
+        [
+            {
+                "Year": 2024,
+                "Eclipse Category": "Total",
+                "Visible": True
+            }
+        ]
     """
 
                                                                                 
