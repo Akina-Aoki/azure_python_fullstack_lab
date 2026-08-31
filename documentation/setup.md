@@ -27,3 +27,5 @@ LINK for code and video: https://github.com/AIgineerAB/cloud_databricks_azure_co
 ## Add EDA dependencies and update uvlock
 - `uv add --dev pandas ipykernel matplotlib seaborn`
 - This automatically updates pyproject.toml and uv.lock.
+
+

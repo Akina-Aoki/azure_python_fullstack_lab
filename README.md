@@ -37,6 +37,8 @@ FastAPI loads the transformed solar and lunar CSV files. Streamlit requests the 
 
 ## Repository structure
 
+Separate pyproject.toml files are created because each part of the project has a different responsibility and different dependencies.
+
 ```text
 azure_python_fullstack_lab/
 ├── backend/
@@ -44,61 +46,38 @@ azure_python_fullstack_lab/
 │   │   ├── raw/
 │   │   └── transformed/
 │   └── src/backend/
+│        └── pyproject.toml            
+│
 ├── frontend/
 │   └── src/frontend/
+│       └── pyproject.toml
+│
 ├── eda/
 ├── dockerfiles/
+│       ├── backend.dockerfile
+│       └── frontend.dockerfile
+│
 ├── documentation/
 ├── docker-compose.yaml
 ├── pyproject.toml
 └── README.md
 ```
+| File                      | Reason                                                                                                                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Root `pyproject.toml`     | Manages the whole project as a **uv workspace** and lists `backend` and `frontend` as members. It can also hold shared development tools such as Jupyter and testing packages. |
+| `backend/pyproject.toml`  | Contains only backend dependencies, such as FastAPI, Uvicorn, and pandas.                                                                                                      |
+| `frontend/pyproject.toml` | Contains only frontend dependencies, such as Streamlit, httpx, and pandas.                                                                                                     |
 
 
-----
 
-## Running the Application Locally
-
-The backend and frontend must run simultaneously in separate terminals.
-
-### 1. Start the FastAPI backend
-
-```bash
-cd backend/src/backend
-uv run uvicorn api:app --reload
-```
-
-FastAPI runs at:
-
-```text
-http://127.0.0.1:8000
-```
-
-API documentation is available at:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-### 2. Start the Streamlit frontend
-
-Open a second terminal:
-
-```bash
-cd frontend/src/frontend
-uv run streamlit run dashboard.py
-```
-
-Streamlit runs at:
-
-```text
-http://localhost:8501
-```
-
-The frontend sends HTTP requests to the FastAPI backend. If the backend is not running, HTTPX returns a connection error such as `WinError 10061`.
-
+- Backend runs FastAPI on port `8000`.
+- Frontend runs Streamlit on port `8501`.
+- Each container installs only the packages it needs.
+- You can deploy, update, or troubleshoot one service without affecting the other.
+- The root file lets you run and manage everything together during local development.
 
 ----
-Notes:
-Request URL:
-`https://airaeclipseboard-container.happytree-7c375eed.swedencentral.azurecontainerapps.io`
+
+## Documentations
+[Set up](documentation/set_up.md)
+[Running app locally](documentation/run_app.md)
