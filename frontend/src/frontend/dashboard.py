@@ -45,6 +45,12 @@ def get_eclipse_data(route: str, params: dict | None = None) -> pd.DataFrame:
 # DISPLAY ONE ECLIPSE TAB
 # ============================================================
 
+def format_eclipse_year(year: int) -> str:
+    """Display astronomical years as user-friendly BCE or CE labels."""
+    if year <= 0:
+        return f"{1 - year} BCE"
+    return f"{year} CE"
+
 
 def show_eclipse_tab(label: str, route: str) -> None:
     """Display one eclipse dataset with the approved filters."""
@@ -53,16 +59,17 @@ def show_eclipse_tab(label: str, route: str) -> None:
 
     # AI-assisted refactor: category options come directly from transformed data.
     # Get every unique year and sort them from earliest to latest.
-    years = sorted(all_eclipses["Year"].unique())
+    years = sorted(all_eclipses["Year"].dropna().astype(int).unique().tolist())
 
     # Get every available eclipse category without duplicates.
-    categories = all_eclipses["Eclipse Category"].drop_duplicates().tolist()
+    categories = ["All", *sorted(all_eclipses["Eclipse Category"].dropna().unique().tolist()),]
 
     # Create a dropdown menu for selecting a year.
     selected_year = st.selectbox(
         f"{label} eclipse year",
         options=years,
         index=years.index(2000) if 2000 in years else 0,             # select 2000 as default
+        format_func = format_eclipse_year,
         key=f"{route}-year",                                        # Give the widget a unique key for the Solar or Lunar tab.
     )
 
@@ -75,14 +82,12 @@ def show_eclipse_tab(label: str, route: str) -> None:
     )
 
 
-    # Request only the records matching both selected filters.
-    filtered_eclipses = get_eclipse_data(
-        route,
-        params={
-            "year": int(selected_year),
-            "eclipse_category": selected_category,
-        },
-    )
+    # Always filter by year, and filter by category when one is selected.
+    params = {"year": int(selected_year)}
+    if selected_category != "All":
+        params["eclipse_category"] = selected_category
+
+    filtered_eclipses = get_eclipse_data(route, params=params)
 
 
     # Display the number of matching eclipse records.
@@ -115,6 +120,12 @@ def main() -> None:
     # Display the dashboard title and introduction.
     st.title("eClipseBord")
     st.markdown("Explore Solar and Lunar eclipses by year and eclipse category.")
+    st.markdown(
+        "**How to read the years:** BCE means a year before year 1, while "
+        "CE means year 1 or later. For example, 2000 BCE is an ancient year, "
+        "2026 CE is our modern time, and future eclipse dates are scientific "
+        "predictions."
+    )
 
 
     # Create separate tabs for the two eclipse datasets.
