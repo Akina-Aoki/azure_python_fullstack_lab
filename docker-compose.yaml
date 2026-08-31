@@ -22,8 +22,8 @@ services:
       - "8000:8000"
 
     # Name and version of the backend image in Azure Container Registry
-    # This needs to be changed
-    image: eclipsebord-backend:v1
+    # This needs to be changed depending on Azure login server
+    image: airaeclipseboard-d9bqc7hqg5gbcsdq.azurecr.io/backend:v1
 
   # Streamlit frontend service
   frontend:
@@ -51,5 +51,5 @@ services:
       BACKEND_URL: http://backend:8000
 
     # Name and version of the frontend image in Azure Container Registry
-    # This needs to be changed
-    image: eclipsebord-frontend:v1
+    # This needs to be changed depending on Azure login server
+    image: airaeclipseboard-d9bqc7hqg5gbcsdq.azurecr.io/frontend:v2
