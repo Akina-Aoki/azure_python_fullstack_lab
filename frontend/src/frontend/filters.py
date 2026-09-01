@@ -49,6 +49,7 @@ def show_filters(
         selected_year = st.selectbox(
             f"{label} eclipse year",
             options=year_options,
+            index = default_year_index(year_options),
             format_func=format_eclipse_year,
             key=f"{route}-year",
         )

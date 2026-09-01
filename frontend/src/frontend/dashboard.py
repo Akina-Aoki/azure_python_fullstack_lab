@@ -4,12 +4,15 @@ Streamlit frontend for the eClipseBord dashboard.
 
 import streamlit as st
 
+from frontend.styles import apply_theme
 from frontend.tabs import ECLIPSE_TABS, show_eclipse_tab
+
 
 def main() -> None:
     """Configure the page and display the Solar and Lunar tabs."""
     # Page configuration must be the first Streamlit command.
     st.set_page_config(page_title="eClipseBord", layout="wide")
+    apply_theme()
 
     # Keep introductory text in the entry point because it belongs to the page,
     # rather than to either eclipse tab.
