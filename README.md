@@ -15,9 +15,17 @@ https://www.kaggle.com/datasets/nasa/solar-eclipses?resource=download
 - Filter records by eclipse category.
 - Switch between Solar and Lunar views.
 
-## Data transformation
+![Dashboard1](assets/dashboard1.png)
+![Dashboard2](assets/dashboard2.png)
 
-The notebooks in `eda/` use pandas to prepare the raw CSV files. They add a numeric `Year` column from `Calendar Date` and an `Eclipse Category` column that turns eclipse type codes into clear category names. The results are saved in `backend/data/transformed/`.
+## Brief Video Explanation
+[![Watch the project demo](assets/yt_thumbnail.png)](https://youtu.be/NfpSd9Q3ALo)
+
+## Data transformation
+- EDA **IS NOT** the main focus on this lab. The focus is about the deployment of an app locally and with Terraform to Azure.
+- The notebooks in `eda/` use pandas to prepare the raw CSV files. 
+- They add a numeric `Year` column from `Calendar Date` and an `Eclipse Category` column that turns eclipse type codes into clear category names. 
+- The results are saved in `backend/data/transformed/`.
 
 ## Technology stack
 
