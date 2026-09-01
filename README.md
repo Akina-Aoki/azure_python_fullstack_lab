@@ -79,5 +79,6 @@ azure_python_fullstack_lab/
 ----
 
 ## Documentations
-[Set up](documentation/set_up.md)
-[Running app locally](documentation/run_app.md)
+- [Set up](documentation/set_up.md)
+- [Running app locally](documentation/run_app.md)
+- [Terraform Infra Set up](documentation/terraform_setup.md)
