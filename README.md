@@ -34,7 +34,25 @@ https://www.kaggle.com/datasets/nasa/solar-eclipses?resource=download
 - Streamlit and HTTPX for the dashboard and API requests
 - Docker and Docker Compose for containers
 - Azure as the lab's deployment target
-- Terraform is not currently included in this repository
+
+<table>
+  <tr>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" width="36" height="36" alt="Python"><br><sub>Python</sub></td>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg" width="36" height="36" alt="FastAPI"><br><sub>FastAPI</sub></td>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pydantic/pydantic-original.svg" width="36" height="36" alt="Pydantic"><br><sub>Pydantic</sub></td>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pandas/pandas-original.svg" width="36" height="36" alt="Pandas"><br><sub>Pandas</sub></td>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/streamlit/streamlit-original.svg" width="36" height="36" alt="Streamlit"><br><sub>Streamlit</sub></td>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg" width="36" height="36" alt="Docker"><br><sub>Docker</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/azure/azure-original.svg" width="36" height="36" alt="Azure"><br><sub>Azure</sub></td>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/terraform/terraform-original.svg" width="36" height="36" alt="Terraform"><br><sub>Terraform</sub></td>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg" width="36" height="36" alt="Git"><br><sub>Git</sub></td>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg" width="36" height="36" alt="GitHub"><br><sub>GitHub</sub></td>
+    <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bash/bash-original.svg" width="36" height="36" alt="Bash"><br><sub>Bash</sub></td>
+    <td></td>
+  </tr>
+</table>
 
 ## Application architecture
 ![Streamlit to Fast API flow](assets/2.png)
@@ -49,6 +67,8 @@ Separate pyproject.toml files are created because each part of the project has a
 
 ```text
 azure_python_fullstack_lab/
+├── assets/
+│
 ├── backend/
 │   ├── data/
 │   │   ├── raw/
@@ -66,8 +86,18 @@ azure_python_fullstack_lab/
 │       └── frontend.dockerfile
 │
 ├── documentation/
+├── infra/
+│   ├── acr.tf
+│   ├── api.tf
+│   ├── input_variables.tf
+│   ├── outputs.tf
+│   ├── providers.tf
+│   ├── random.tf
+│   ├── resource_group.tf
+│   └── web_app.tf
 ├── docker-compose.yaml
 ├── pyproject.toml
+├── deploy_infra.sh
 └── README.md
 ```
 | File                      | Reason                                                                                                                                                                        |
