@@ -1,6 +1,7 @@
 """Reusable eclipse event cards for the Solar and Lunar tabs."""
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
+from datetime import datetime
 from typing import Any
 
 import pandas as pd
@@ -10,34 +11,39 @@ from frontend.filters import format_eclipse_year
 
 
 COMMON_FIELDS = (
-    ("Time", "Eclipse Time", ""),
-    ("Saros number", "Saros Number", ""),
-    ("Location", ("Latitude", "Longitude"), ""),
+    "Catalog Number",
+    "Eclipse Time",
+    "Delta T (s)",
+    "Lunation Number",
+    "Saros Number",
+    "Eclipse Type",
 )
 
 # A small configuration captures only the schema differences between datasets.
 EVENT_FIELDS = {
     "solar": (
-        ("Magnitude", "Eclipse Magnitude", ""),
-        ("Duration", "Central Duration", ""),
-        ("Path width", "Path Width (km)", " km"),
-        ("Eclipse type", "Eclipse Type", ""),
         *COMMON_FIELDS,
+        "Gamma",
+        "Eclipse Magnitude",
+        "Latitude",
+        "Longtitude",
+        "Sun Altitude",
+        "Sun Azimuth",
+        "Path Width",
+        "Central Duration",
     ),
+
     "lunar": (
-        ("Magnitude", "Umbral Magnitude", ""),
-        (
-            "Duration",
-            {
-                "Penumbral": "Penumbral Eclipse Duration (m)",
-                "Partial": "Partial Eclipse Duration (m)",
-                "Total": "Total Eclipse Duration (m)",
-            },
-            " min",
-        ),
-        ("Penumbral magnitude", "Penumbral Magnitude", ""),
-        ("Eclipse type", "Eclipse Type", ""),
         *COMMON_FIELDS,
+        "Quincena Solar Eclipse",
+        "Gamma",
+        "Penumbral Magnitude",
+        "Umbral Magnitude",
+        "Latitude",
+        "Longitude",
+        "Penumbral Eclipse Duration (m)",
+        "Partial Eclipse Duration (m)",
+        "Total Eclipse Duration (m)",
     ),
 }
 
@@ -52,14 +58,38 @@ def is_present(value: Any) -> bool:
         return True
 
 
-def field_value(row: pd.Series, source: Any) -> Any:
-    """Read a direct, combined, or category-dependent configured field."""
-    if isinstance(source, Mapping):
-        return row.get(source.get(row.get("Eclipse Category"), ""))
-    if isinstance(source, tuple):
-        values = [str(row.get(column)) for column in source if is_present(row.get(column))]
-        return ", ".join(values) if values else None
-    return row.get(source)
+def format_value(value: Any) -> str:
+    """Format a raw API value without adding precision not present in it."""
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value)
+
+
+def format_calendar_date(value: Any) -> str:
+    """Move the catalog year to the end for a familiar event-date display."""
+    if not is_present(value):
+        return "Date unavailable"
+    value = str(value)
+    parts = value.split(maxsplit=2)
+    if len(parts) != 3:
+        return value
+    year, month, day = parts
+    try:
+        month = datetime.strptime(month, "%B").strftime("%B")
+        display_year = format_eclipse_year(int(year)).removesuffix(" CE")
+        return f"{month} {int(day)}, {display_year}"
+    except ValueError:
+        return value
+
+
+def event_details(row: pd.Series, fields: Sequence[str]) -> pd.DataFrame:
+    """Build the compact property/value table for an eclipse record."""
+    details = [
+        {"Property": field, "Value": format_value(row.get(field))}
+        for field in fields
+        if is_present(row.get(field))
+    ]
+    return pd.DataFrame(details, columns=["Property", "Value"])
 
 
 def chronological_events(data: pd.DataFrame) -> pd.DataFrame:
@@ -100,19 +130,26 @@ def show_event_cards(data: pd.DataFrame, kind: str, selected_year: int | str) ->
         st.info("No eclipse events match the selected filters.")
         return
 
-    fields: Sequence[tuple[str, Any, str]] = EVENT_FIELDS[kind]
+    fields: Sequence[str] = EVENT_FIELDS[kind]
     for _, row in chronological_events(data).iterrows():
-        date = row.get("Calendar Date", "Date unavailable")
-        category = row.get("Eclipse Category")
-        heading = f"**{date}**" + (f" · {category}" if is_present(category) else "")
         with st.container(border=True):
-            st.markdown(heading)
-            values = []
-            for label, source, suffix in fields:
-                value = field_value(row, source)
-                if is_present(value):
-                    values.append((label, f"{value}{suffix}"))
-            for start in range(0, len(values), 4):
-                batch = values[start : start + 4]
-                for column, (label, value) in zip(st.columns(len(batch)), batch):
-                    column.metric(label, value)
+            year_column, category_column, date_column = st.columns(3)
+            year_column.metric("YEAR", format_value(row.get("Year")))
+            category_column.metric(
+                "ECLIPSE CATEGORY", format_value(row.get("Eclipse Category"))
+            )
+            date_column.metric(
+                "CALENDAR DATE", format_calendar_date(row.get("Calendar Date"))
+            )
+
+            details = event_details(row, fields)
+            st.dataframe(
+                details,
+                hide_index=True,
+                use_container_width=True,
+                height=min(38 + 35 * len(details), 600),
+                column_config={
+                    "Property": st.column_config.TextColumn(width="medium"),
+                    "Value": st.column_config.TextColumn(width="large"),
+                },
+            )
