@@ -6,6 +6,18 @@ import pandas as pd
 import streamlit as st
 
 
+DEFAULT_ECLIPSE_YEAR = 2026
+
+
+def default_year_index(year_options: list[int | str]) -> int:
+    """Return the position of the preferred year, falling back to all years."""
+    return (
+        year_options.index(DEFAULT_ECLIPSE_YEAR)
+        if DEFAULT_ECLIPSE_YEAR in year_options
+        else 0
+    )
+
+
 def format_eclipse_year(year: int | str) -> str:
     """Display astronomical years as user-friendly BCE or CE labels."""
     # Keep the non-numeric option unchanged in the select box.

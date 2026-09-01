@@ -4,7 +4,7 @@
 import streamlit as st
 
 from frontend.api_client import get_eclipse_data
-from frontend.charts import show_charts
+from frontend.events import show_event_cards
 from frontend.filters import show_filters
 from frontend.metrics import show_kpis
 
@@ -37,7 +37,9 @@ def show_eclipse_tab(config: dict[str, str]) -> None:
 
     st.divider()
     show_kpis(filtered_eclipses, config["kind"])
-    show_charts(filtered_eclipses)
+    selected_year = params.get("year", "All years")
+    show_event_cards(filtered_eclipses, config["kind"], selected_year)
+
 
     # Keep the detailed source records below the summary visualizations.
     st.subheader(f"{config['label']} eclipse records")
