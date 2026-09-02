@@ -4,6 +4,7 @@ Show knowledge in Python, FastAPI,  Streamlit as well as Docker and Azure to bui
 ## Project overview
 eClipseBord displays solar and lunar eclipse data in a web dashboard. The project uses transformed CSV data, a FastAPI backend, and a Streamlit frontend.
 
+- Picture by AIgineer AB
 ![Task](assets/1.png)
 
 ## Dataset
