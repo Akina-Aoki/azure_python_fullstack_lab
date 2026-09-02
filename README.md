@@ -120,3 +120,11 @@ azure_python_fullstack_lab/
 - [Set up](documentation/set_up.md)
 - [Running app locally](documentation/run_app.md)
 - [Terraform Infra Set up](documentation/terraform_setup.md)
+- [Cloud Azure Course (Kokchun's Github):](https://github.com/AIgineerAB/cloud_databricks_azure_course)
+
+## My Youtube videos struggling to explain and understand Terraform
+[![Terraform Series Part 1:Intro & Providers](assets/yt_thumbnail_tf1.png)](https://www.youtube.com/watch?v=eucMow2W4PE)
+[![Terraform Series Part 2:Input Variables](assets/yt_thumbnail_tf2.png)](https://youtu.be/yMYMsDSpLD0)
+[![Terraform Series Part 3:Resource Group & Azure Container Registry](assets/yt_thumbnail_tf3.png)](https://www.youtube.com/watch?v=WppCffxy8QA)
+[![Terraform Series Part 4:Container App & Environment (Backend)](assets/yt_thumbnail_tf4.png)](https://www.youtube.com/watch?v=4ViBG8tlmWk)
+[![Terraform Series Part 5:Azure Web App (Frontend)](assets/yt_thumbnail_tf5.png)](https://youtu.be/tuIOHfakgpI)
