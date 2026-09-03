@@ -97,6 +97,7 @@ azure_python_fullstack_lab/
 │   ├── resource_group.tf
 │   └── web_app.tf
 ├── docker-compose.yaml
+├── docker-compose.azure.yaml
 ├── pyproject.toml
 ├── deploy_infra.sh
 └── README.md
