@@ -25,7 +25,7 @@ services:
     # This needs to be changed depending on Azure login server
     # Use env variables so it adapts to variable settings
     # image: airaeclipseboard-d9bqc7hqg5gbcsdq.azurecr.io/backend:v1 <- Used for deploying to azure with containerized env
-    # image: ${ACR_LOGIN_SERVER}/backend:${IMAGE_TAG:-latest} # Use for deploying to Azure with Terraform
+    image: ${ACR_LOGIN_SERVER}/backend:${IMAGE_TAG:-latest} # Use for deploying to Azure with Terraform
 
   # Streamlit frontend service
   frontend:
@@ -55,7 +55,4 @@ services:
     # Name and version of the frontend image in Azure Container Registry
     # This needs to be changed depending on Azure login server
     # image: airaeclipseboard-d9bqc7hqg5gbcsdq.azurecr.io/frontend:v2 <- Used for deploying to azure with containerized env
-    #image: ${ACR_LOGIN_SERVER}/frontend:${IMAGE_TAG:-latest} # Use for deploying to Azure with Terraform
-
-    depends_on:
-      - backend
+    image: ${ACR_LOGIN_SERVER}/frontend:${IMAGE_TAG:-latest} # Use for deploying to Azure with Terraform

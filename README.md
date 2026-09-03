@@ -20,7 +20,7 @@ https://www.kaggle.com/datasets/nasa/solar-eclipses?resource=download
 ![Dashboard2](assets/dashboard2.png)
 
 ## Brief Video Explanation
-[![Watch the project demo](assets/yt_thumbnail.png)](https://youtu.be/NfpSd9Q3ALo)
+[![Watch the project demo](assets/yt_thumbnail.png)](https://youtu.be/H0DdgOV8x0w)
 
 ## Data transformation
 - EDA **IS NOT** the main focus on this lab. The focus is about the deployment of an app locally and with Terraform to Azure.
